@@ -15,7 +15,8 @@ def parse(str)
       %w(rss shared private).each do |n|
         cap_n = n.capitalize
         if /\A#{cap_n}\s+(\d+)/ =~ l
-          dump[:memory_stats][process_id][n.to_sym] = $1.to_i if dump[:memory_stats][process_id][n.to_sym] < $1.to_i
+          now = dump[:memory_stats][process_id][n.to_sym]
+          dump[:memory_stats][process_id][n.to_sym] = $1.to_i
         end
       end
       process_id = nil if l.include? "gc count"
@@ -43,9 +44,10 @@ def report(data)
   req_par_sec = total/data[:request_secs].size
 
   puts <<EOS
-USE_MEM     : #{mem_priv_total}\tkb
 SHARED_AVE  : #{mem_shared_ave}\tkb
+SHARED_TOTAL: #{mem_shared_total}\tkb
 PRIV_AVE    : #{mem_priv_ave}\tkb
+PRIV_TOTAL  : #{mem_priv_total}\tkb
 REQ/SEC     : #{req_par_sec}
 EOS
 end
