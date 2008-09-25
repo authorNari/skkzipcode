@@ -30,9 +30,11 @@ end
 list = input_zipcodes(File.join(File.dirname(__FILE__), "SKK-JISYO.zipcode"))
 list = ARGV unless ARGV.size.zero?
 
+process_ids = []
 @client.times do
-  fork do
-    Benchmark.bm(7, "request/sec:") do |x|
+  process_ids << fork do
+    $stderr = $stdout = File.open("/tmp/skk_exelog_#{$$}", "w")
+    Benchmark.bm do |x|
       t = x.report("request_time:") do
         list.each do |e|
           s = TCPSocket.new("localhost", 12345)
@@ -43,9 +45,15 @@ list = ARGV unless ARGV.size.zero?
           s.close
         end
       end
-      [t/@request]
+      open("/tmp/skk_reqsec_#{$$}", "w") {|f| f.write "request/sec:#{(t/@request).to_s}" }
     end
     exit!
   end
 end
 
+Process.waitall
+cat_command = "cat "
+process_ids.each{|id| cat_command << " /tmp/skk_exelog_#{id} /tmp/skk_reqsec_#{id} " }
+cat_command << " > /tmp/skk_exelog"
+exec cat_command
+exec "rm -f /tmp/skk_exelog_*"

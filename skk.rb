@@ -63,8 +63,8 @@ Process.daemon unless $DEBUG
 @proc = lambda do |s|
   while s.gets
     s.puts("#{postcode2adress($_.chomp)}")
-    puts("#{cow_dump($$, 'prefork process')}") if $DEBUG
-    puts("gc count : #{GC.count}") if $DEBUG
+    s.puts("#{cow_dump($$, 'prefork process')}") if $DEBUG
+    s.puts("gc count : #{GC.count}") if $DEBUG
     s.close_write
   end
   s.close
