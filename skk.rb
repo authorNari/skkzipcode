@@ -1,3 +1,5 @@
+require 'prefork'
+
 if $DEBUG
   # for memory profile
   def cow_dump(pid, type=:none)
@@ -56,11 +58,20 @@ def postcode2adress(postcode)
   adres
 end
 
+GC::Profiler.enable if $DEBUG
 postcode_dict(File.join(File.dirname(__FILE__), "SKK-JISYO.zipcode"))
 
 Process.daemon unless $DEBUG
-@server = TCPServer.new("localhost", 12345)
-@proc = lambda do |s|
+@prefork = PreFork.new(12345)
+@prefork.min_servers = 5
+@prefork.max_servers = 5
+@prefork.max_use = 100000
+@prefork.max_idle = 100000
+
+GC.start if $DEBUG
+GC::Profiler.report if $DEBUG
+
+@prefork.start do |s|
   while s.gets
     s.puts("#{postcode2adress($_.chomp)}")
     s.puts("#{cow_dump($$, 'prefork process')}") if $DEBUG
@@ -69,5 +80,5 @@ Process.daemon unless $DEBUG
   end
   s.close
 end
-5.times{ fork{ loop{ @proc.call(@server.accept) } } }
+
 Process.waitall
