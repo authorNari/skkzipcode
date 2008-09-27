@@ -1,6 +1,14 @@
+require 'optparse'
 require 'prefork'
 
-if $DEBUG
+opt = OptionParser.new
+@mem_prof = false
+@gc_prof = false
+opt.on("-m"){|v| @mem_prof = true}
+opt.on("-g"){|v| @gc_prof = true}
+opt.parse!(ARGV)
+
+if @mem_prof
   # for memory profile
   def cow_dump(pid, type=:none)
     rss = 0
@@ -58,7 +66,7 @@ def postcode2adress(postcode)
   adres
 end
 
-GC::Profiler.enable if $DEBUG
+GC::Profiler.enable if @gc_prof
 postcode_dict(File.join(File.dirname(__FILE__), "SKK-JISYO.zipcode"))
 
 Process.daemon unless $DEBUG
@@ -68,17 +76,15 @@ Process.daemon unless $DEBUG
 @prefork.max_use = 100000
 @prefork.max_idle = 100000
 
-GC.start if $DEBUG
-GC::Profiler.report if $DEBUG
-
 @prefork.start do |s|
   while s.gets
     s.puts("#{postcode2adress($_.chomp)}")
-    s.puts("#{cow_dump($$, 'prefork process')}") if $DEBUG
-    s.puts("gc count : #{GC.count}") if $DEBUG
+    s.puts("#{cow_dump($$, 'prefork process')}") if @mem_prof
+    s.puts("gc count : #{GC.count}") if @mem_prof
     s.close_write
   end
   s.close
+  GC::Profiler.report if @gc_prof
 end
 
 Process.waitall
