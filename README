@@ -19,7 +19,7 @@ Server
   t1$ ruby -I. skk.rb -m
 
 Client
-  t2$ ruby deamon_client.rb
+  t2$ ruby daemon_client.rb
   t2$ ruby skk_log_parse.rb /tmp/skk_exelog
   PROCESS_CNT : 5 
   SHARED_AVE  : 11824.8   kb
