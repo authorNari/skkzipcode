@@ -66,10 +66,16 @@ def postcode2adress(postcode)
   adres
 end
 
+def gc_count
+  return ((defined? GC.count) ? GC.count : 0)
+end
+
 GC::Profiler.enable if @gc_prof
 postcode_dict(File.join(File.dirname(__FILE__), "SKK-JISYO.zipcode"))
 
-Process.daemon unless $DEBUG
+if !$DEBUG && RUBY_VERSION >= '1.9'
+  Process.daemon
+end
 @prefork = PreFork.new(12345)
 @prefork.min_servers = 5
 @prefork.max_servers = 5
@@ -80,11 +86,13 @@ Process.daemon unless $DEBUG
   while s.gets
     s.puts("#{postcode2adress($_.chomp)}")
     s.puts("#{cow_dump($$, 'prefork process')}") if @mem_prof
-    s.puts("gc count : #{GC.count}") if @mem_prof
+    s.puts("gc count : #{gc_count}") if @mem_prof
     s.close_write
   end
   s.close
   GC::Profiler.report if @gc_prof
 end
 
-Process.waitall
+if !$DEBUG && RUBY_VERSION >= '1.9'
+  Process.waitall
+end
