@@ -28,8 +28,8 @@ Client
   PRIV_TOTAL  : 224892    kb
   REQ/SEC     : 0.007594
 
-* PROCESS_CNT: count of prefork processes
-* SHARED_AVE: average of shared memory usage (KB)
-* SHARED_TOTAL: total of shared memory usage (KB)
-* PRIV_AVE: average of private memory usage (KB)
-* PRIV_TOTAL: total of private memory usage (KB)
+* PROCESS_CNT: count of child processes
+* SHARED_AVE: average of shared memory usage of child processes (KB)
+* SHARED_TOTAL: total of shared memory usage of child processes (KB)
+* PRIV_AVE: average of private memory usage of child processes (KB)
+* PRIV_TOTAL: total of private memory usage of child processes (KB)
