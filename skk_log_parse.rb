@@ -44,7 +44,7 @@ def report(data)
   req_par_sec = total/data[:request_secs].size
 
   puts <<EOS
-PRCOESS_CNT : #{data[:memory_stats].size}\t
+PROCESS_CNT : #{data[:memory_stats].size}\t
 SHARED_AVE  : #{mem_shared_ave}\tkb
 SHARED_TOTAL: #{mem_shared_total}\tkb
 PRIV_AVE    : #{mem_priv_ave}\tkb
