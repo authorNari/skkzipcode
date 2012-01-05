@@ -8,6 +8,10 @@ opt.on("-m"){|v| @mem_prof = true}
 opt.on("-g"){|v| @gc_prof = true}
 opt.parse!(ARGV)
 
+if defined? GC.copy_on_write_friendly?
+  GC.copy_on_write_friendly = true
+end
+
 if @mem_prof
   # for memory profile
   def cow_dump(pid, type=:none)
